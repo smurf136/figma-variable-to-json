@@ -1,0 +1,253 @@
+<style>
+  body,
+  html {
+    margin: 0;
+  }
+
+  .main {
+    width: 340px;
+    height: 560px;
+    background-color: wheat;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .dropdown {
+    border: 1px grey solid;
+    border-radius: 24px;
+    padding: 0px 16px;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  .dropdown p::after {
+    content: "▼";
+  }
+
+  .dropdown-list {
+    width: 164px;
+    max-height: 80px;
+
+    background-color: aqua;
+
+    position: absolute;
+    top: 200px;
+
+    overflow: scroll;
+  }
+
+  .dropdown-item {
+    border-top: 1px solid black;
+    cursor: pointer;
+  }
+
+  .dropdown-list :nth-child(1) {
+    border-top: none;
+  }
+
+  .collection {
+    left: 16px;
+  }
+
+  .type {
+    right: 0px;
+  }
+
+  .button {
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+    padding: 8px 32px;
+    cursor: pointer;
+  }
+
+  .brown {
+    background-color: brown;
+  }
+
+  .green {
+    background-color: green;
+  }
+
+  .tooltip {
+    display: none;
+  }
+</style>
+
+<div class="main" id="main">
+  <div class="row" id="filter">
+    <div class="dropdown" id="collection-list">
+      <p>select collection</p>
+    </div>
+    <div class="dropdown" id="group-list">
+      <p>select group</p>
+    </div>
+  </div>
+  <br>
+  <textarea name="" id="data" cols="30" rows="10" readonly="readonly"></textarea>
+  <br>
+  <div class="row" id="action">
+    <div class="button brown" id="copy-data">Copy</div>
+    <div class="button green" id="gen-data">Gen Data</div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="tooltip" id="tooltip">copy success!</div>
+  </div>
+</div>
+
+
+<script>
+
+  var isOpenDropdownCollectionList = false;
+  var isOpenDropdownTypeList = false;
+  var exportType = '';
+  var collectionList = [];
+  var groupList = [];
+  var currentSelectCollection = {}
+  var currentSelectGroup = ''
+  var isShowTooltip = false;
+
+  document.getElementById('collection-list').onclick = () => {
+    const main = document.getElementById('main')
+    if (isOpenDropdownCollectionList) {
+      const dropdown = document.getElementById('collection-dropdown-list')
+      main.removeChild(dropdown)
+      isOpenDropdownCollectionList = false;
+    } else {
+      parent.postMessage({ pluginMessage: { type: 'get-collection' } }, '*',)
+    }
+
+  }
+
+  document.getElementById('group-list').onclick = () => {
+    const main = document.getElementById('main')
+    if (isOpenDropdownTypeList) {
+      const dropdown = document.getElementById('type-dropdown-list')
+      main.removeChild(dropdown)
+      isOpenDropdownTypeList = false;
+    } else {
+      const dropdownBox = document.createElement('div');
+      dropdownBox.classList.add('dropdown-list')
+      dropdownBox.classList.add('type')
+      dropdownBox.id = 'type-dropdown-list';
+
+      for (let i = 0; i < groupList.length; i++) {
+        const dropdownItem = document.createElement('div')
+        dropdownItem.classList.add('dropdown-item')
+        dropdownItem.innerText = `${groupList[i]}`;
+
+        dropdownItem.onclick = () => {
+          currentSelectGroup = groupList[i]
+          document.getElementById('group-list').getElementsByTagName('p')[0].innerText = groupList[i];
+          const dropdown = document.getElementById('type-dropdown-list')
+          main.removeChild(dropdown)
+          isOpenDropdownTypeList = false;
+        }
+
+        dropdownBox.appendChild(dropdownItem)
+      }
+
+      main.appendChild(dropdownBox)
+
+      isOpenDropdownTypeList = true;
+    }
+  }
+
+  document.getElementById('gen-data').onclick = () => {
+    parent.postMessage({ pluginMessage: { type: 'gen-data', collectionId: currentSelectCollection.id, group: currentSelectGroup } }, '*',)
+  }
+
+  document.getElementById('copy-data').onclick = () => {
+    const textarea = document.getElementById('data');
+    if (isShowTooltip || textarea.value === '') return;
+    textarea.select();
+    document.execCommand("copy");
+    document.getElementById('tooltip').style = 'padding: 4px;align-self: center;display: block;border-radius: 12px;background-color: lightGreen;'
+    let count = 3;
+    const timer = setInterval(function () {
+      count--;
+      if (count === 0) {
+        document.getElementById('tooltip').style = 'display: none;'
+        clearInterval(timer);
+      }
+    }, 1000);
+
+  }
+
+
+  onmessage = (event) => {
+    if (event.data.pluginMessage?.type == 'get-collection') {
+      const main = document.getElementById('main')
+
+      const dropdownBox = document.createElement('div');
+      dropdownBox.classList.add('dropdown-list')
+      dropdownBox.classList.add('collection')
+      dropdownBox.id = 'collection-dropdown-list';
+      collectionList = []
+      const result = event.data.pluginMessage?.result;
+      if (result.length > 0) {
+        collectionList = result;
+        for (let i = 0; i < result.length; i++) {
+          const dropdownItem = document.createElement('div')
+          dropdownItem.classList.add('dropdown-item')
+          dropdownItem.innerText = `${result[i].name}`;
+          dropdownItem.onclick = () => {
+            currentSelectCollection = result[i]
+            document.getElementById('collection-list').getElementsByTagName('p')[0].innerText = result[i].name;
+            const dropdown = document.getElementById('collection-dropdown-list')
+            main.removeChild(dropdown)
+            parent.postMessage({ pluginMessage: { type: 'select-collection', collectionId: result[i].id } }, '*',)
+
+            isOpenDropdownCollectionList = false;
+          }
+          dropdownBox.appendChild(dropdownItem)
+
+        }
+      } else {
+        const dropdownItem = document.createElement('div')
+        dropdownItem.classList.add('dropdown-item')
+        dropdownItem.innerText = `empty`;
+        dropdownBox.appendChild(dropdownItem)
+      }
+
+      main.appendChild(dropdownBox)
+      isOpenDropdownCollectionList = true;
+    }
+
+    if (event.data.pluginMessage?.type == 'select-collection') {
+      groupList = event.data.pluginMessage?.groupList;
+    }
+
+    if (event.data.pluginMessage?.type == 'gen-data') {
+      const textarea = document.getElementById('data')
+      const rawData = [...event.data.pluginMessage?.variableList];
+      const formatData = []
+      const modeKey = [...currentSelectCollection.modes]
+
+      rawData.forEach((item) => {
+        const map = {
+          key: item.key,
+        }
+
+        modeKey.forEach((key) => {
+          map[key.name] = item.modes[key.modeId]
+        })
+
+
+        formatData.push(map)
+      })
+
+      textarea.value = JSON.stringify(formatData);
+    }
+
+  }
+</script>
