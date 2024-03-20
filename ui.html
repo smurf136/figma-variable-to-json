@@ -2,252 +2,389 @@
   body,
   html {
     margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  p {
+    font-family: "Kanit", sans-serif;
+    font-style: normal;
+    font-size: 14px;
+    margin: 0px;
+  }
+
+  div {
+    font-family: "Kanit", sans-serif;
+    font-style: normal;
+    font-size: 14px;
   }
 
   .main {
     width: 340px;
     height: 560px;
-    background-color: wheat;
+    background-color: #28293d;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    padding: 8px;
+
   }
 
   .row {
+    width: 94%;
     display: flex;
+    flex-wrap: nowrap;
     flex-direction: row;
-    justify-content: space-around;
+  }
+
+  .column {
+    flex: 1;
+    display: column;
+    gap: 4px 0px;
+    /* flex-grow: 1; */
+  }
+
+  .column p {
+    color: white;
+  }
+
+  .temp {
+    width: 24px;
+    height: 24px;
+    background-color: orange;
   }
 
   .dropdown {
-    border: 1px grey solid;
-    border-radius: 24px;
-    padding: 0px 16px;
-    background-color: white;
+    display: flex;
+    width: 128px;
+    flex-direction: row;
+    padding: 8px 12px;
+    border: 1px solid #8f90a6;
+    border-radius: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-content: space-between;
+    gap: 8px;
+    align-self: stretch;
     cursor: pointer;
   }
 
-  .dropdown p::after {
-    content: "▼";
+  .dropdown:hover {
+    border: 1px solid #c7c9d9;
   }
 
-  .dropdown-list {
-    width: 164px;
-    max-height: 80px;
-
-    background-color: aqua;
-
-    position: absolute;
-    top: 200px;
-
-    overflow: scroll;
+  .dropdown p {
+    width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .dropdown-item {
-    border-top: 1px solid black;
-    cursor: pointer;
-  }
-
-  .dropdown-list :nth-child(1) {
-    border-top: none;
-  }
-
-  .collection {
-    left: 16px;
-  }
-
-  .type {
-    right: 0px;
+  textarea {
+    width: 94%;
+    height: 70%;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    border: 0px solid #ccc;
+    border-radius: 4px;
+    background-color: #363752;
+    color: white;
+    font-size: 16px;
+    resize: none;
+    margin-bottom: 24px;
+    font-family: "Kanit", sans-serif;
+    font-style: normal;
+    font-size: 14px;
   }
 
   .button {
-    border-radius: 12px;
-    text-align: center;
+    background-color: #3e7bfa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .submit-button {
+    width: 80%;
+    height: 40px;
+    border-radius: 8px 0px 0px 8px;
+    flex-grow: 1;
+    padding: 4px 0px;
+  }
+
+  .submit-button p {
+    margin: 0;
     color: white;
     font-size: 16px;
-    padding: 8px 32px;
+  }
+
+  .copy-button {
+    padding: 8px;
+    border-radius: 0px 8px 8px 0px;
+  }
+
+  .dropdown-list {
+    width: 94%;
+    max-height: 50%;
+
+    background-color: #28293d;
+
+    position: absolute;
+    top: 80px;
+
+    overflow: scroll;
+    border: 1px solid #555770;
+    border-radius: 4px;
+  }
+
+  .dropdown-item {
     cursor: pointer;
+    width: 100%;
+    padding: 8px 12px;
   }
 
-  .brown {
-    background-color: brown;
-  }
-
-  .green {
-    background-color: green;
-  }
-
-  .tooltip {
-    display: none;
+  .dropdown-item:hover {
+    background-color: #555770;
   }
 </style>
 
 <div class="main" id="main">
-  <div class="row" id="filter">
-    <div class="dropdown" id="collection-list">
-      <p>select collection</p>
+  <div class="row" style="margin-bottom: 12px;gap: 0px 8px;">
+    <div class="column" id="collection">
+      <p>Collection</p>
+      <div class="dropdown" id="collection-list">
+        <div id="current-collection">
+          <p style="color: #555770;">Select Collection</p>
+        </div>
+        <span style="color: #555770; font-size: 20px">
+          <i id="dropdown-collection" class="fa fa-angle-down" aria-hidden="true"></i>
+        </span>
+      </div>
     </div>
-    <div class="dropdown" id="group-list">
-      <p>select group</p>
+    <div class="column" id="group">
+      <p>Group</p>
+      <div class="dropdown" id="group-list">
+        <div id="current-group">
+          <p style="color: #555770;">Select Group</p>
+        </div>
+        <span style="color: #555770; font-size: 20px">
+          <i id="dropdown-group" class="fa fa-angle-down" aria-hidden="true"></i>
+        </span>
+      </div>
     </div>
   </div>
-  <br>
-  <textarea name="" id="data" cols="30" rows="10" readonly="readonly"></textarea>
-  <br>
-  <div class="row" id="action">
-    <div class="button brown" id="copy-data">Copy</div>
-    <div class="button green" id="gen-data">Gen Data</div>
-  </div>
-  <br>
-  <div class="row">
-    <div class="tooltip" id="tooltip">copy success!</div>
+  <textarea name="value" id="data" cols="30" rows="10"></textarea>
+  <div class="row" style="gap: 0px 2px;">
+    <div class="button submit-button" id="gen-data">
+      <p>GEN JSON</p>
+    </div>
+    <div class="button copy-button" id="copy-data">
+      <span style="color: white; font-size: 24px">
+        <i class="fa-regular fa-copy"></i>
+      </span>
+    </div>
   </div>
 </div>
-
-
+<script src="https://kit.fontawesome.com/80663c7ed5.js" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+  rel="stylesheet">
 <script>
-
   var isOpenDropdownCollectionList = false;
   var isOpenDropdownTypeList = false;
-  var exportType = '';
+  var exportType = "";
   var collectionList = [];
   var groupList = [];
-  var currentSelectCollection = {}
-  var currentSelectGroup = ''
+  var currentSelectCollection = {};
+  var currentSelectGroup = "";
   var isShowTooltip = false;
 
-  document.getElementById('collection-list').onclick = () => {
-    const main = document.getElementById('main')
+  // check which dropdown open for border current active
+
+  document.getElementById("collection-list").onclick = () => {
+    const main = document.getElementById("main");
     if (isOpenDropdownCollectionList) {
-      const dropdown = document.getElementById('collection-dropdown-list')
-      main.removeChild(dropdown)
+      const dropdown = document.getElementById("collection-dropdown-list");
+      main.removeChild(dropdown);
       isOpenDropdownCollectionList = false;
     } else {
-      parent.postMessage({ pluginMessage: { type: 'get-collection' } }, '*',)
+      parent.postMessage({ pluginMessage: { type: "get-collection" } }, "*");
     }
 
-  }
+    const dropdown = document.getElementById("dropdown-collection");
+    if (dropdown.className.includes("up")) {
+      dropdown.className = "fa fa-angle-down";
+    } else {
+      dropdown.className = "fa fa-angle-up";
+    }
+  };
 
-  document.getElementById('group-list').onclick = () => {
-    const main = document.getElementById('main')
+  document.getElementById("group-list").onclick = () => {
+    const main = document.getElementById("main");
     if (isOpenDropdownTypeList) {
-      const dropdown = document.getElementById('type-dropdown-list')
-      main.removeChild(dropdown)
+      const dropdown = document.getElementById("type-dropdown-list");
+      main.removeChild(dropdown);
       isOpenDropdownTypeList = false;
     } else {
-      const dropdownBox = document.createElement('div');
-      dropdownBox.classList.add('dropdown-list')
-      dropdownBox.classList.add('type')
-      dropdownBox.id = 'type-dropdown-list';
+      const dropdownBox = document.createElement("div");
+      dropdownBox.classList.add("dropdown-list");
+      dropdownBox.classList.add("type");
+      dropdownBox.id = "type-dropdown-list";
 
-      for (let i = 0; i < groupList.length; i++) {
-        const dropdownItem = document.createElement('div')
-        dropdownItem.classList.add('dropdown-item')
-        dropdownItem.innerText = `${groupList[i]}`;
+      for (let group of groupList) {
+        const dropdownItem = document.createElement("div");
+        dropdownItem.classList.add("dropdown-item");
+        dropdownItem.innerText = `${group}`;
+        dropdownItem.style = "color: white;";
 
         dropdownItem.onclick = () => {
-          currentSelectGroup = groupList[i]
-          document.getElementById('group-list').getElementsByTagName('p')[0].innerText = groupList[i];
-          const dropdown = document.getElementById('type-dropdown-list')
-          main.removeChild(dropdown)
+          currentSelectGroup = group;
+          const groupSelect = document
+            .getElementById("group-list")
+            .getElementsByTagName("div")[0];
+          groupSelect.innerHTML = `<p>${group}</p>`;
+          groupSelect.style = "color: white;";
+          const dropdown = document.getElementById("dropdown-group");
+          if (dropdown.className.includes("up")) {
+            dropdown.className = "fa fa-angle-down";
+          } else {
+            dropdown.className = "fa fa-angle-up";
+          }
+          const dropdownList = document.getElementById("type-dropdown-list");
+          main.removeChild(dropdownList);
           isOpenDropdownTypeList = false;
-        }
+        };
 
-        dropdownBox.appendChild(dropdownItem)
+        dropdownBox.appendChild(dropdownItem);
       }
 
-      main.appendChild(dropdownBox)
+      main.appendChild(dropdownBox);
 
       isOpenDropdownTypeList = true;
     }
-  }
 
-  document.getElementById('gen-data').onclick = () => {
-    parent.postMessage({ pluginMessage: { type: 'gen-data', collectionId: currentSelectCollection.id, group: currentSelectGroup } }, '*',)
-  }
+    const dropdown = document.getElementById("dropdown-group");
+    if (dropdown.className.includes("up")) {
+      dropdown.className = "fa fa-angle-down";
+    } else {
+      dropdown.className = "fa fa-angle-up";
+    }
+  };
 
-  document.getElementById('copy-data').onclick = () => {
-    const textarea = document.getElementById('data');
-    if (isShowTooltip || textarea.value === '') return;
+  document.getElementById("gen-data").onclick = () => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "gen-data",
+          collectionId: currentSelectCollection.id,
+          group: currentSelectGroup,
+        },
+      },
+      "*"
+    );
+  };
+
+  document.getElementById("copy-data").onclick = () => {
+    const textarea = document.getElementById("data");
+    if (isShowTooltip || textarea.value === "") return;
     textarea.select();
     document.execCommand("copy");
-    document.getElementById('tooltip').style = 'padding: 4px;align-self: center;display: block;border-radius: 12px;background-color: lightGreen;'
+    document.getElementById("tooltip").style =
+      "padding: 4px;align-self: center;display: block;border-radius: 12px;background-color: lightGreen;";
     let count = 3;
     const timer = setInterval(function () {
       count--;
       if (count === 0) {
-        document.getElementById('tooltip').style = 'display: none;'
+        document.getElementById("tooltip").style = "display: none;";
         clearInterval(timer);
       }
     }, 1000);
-
-  }
-
+  };
 
   onmessage = (event) => {
-    if (event.data.pluginMessage?.type == 'get-collection') {
-      const main = document.getElementById('main')
+    if (event.data.pluginMessage?.type === "get-collection") {
+      const main = document.getElementById("main");
 
-      const dropdownBox = document.createElement('div');
-      dropdownBox.classList.add('dropdown-list')
-      dropdownBox.classList.add('collection')
-      dropdownBox.id = 'collection-dropdown-list';
-      collectionList = []
+      const dropdownBox = document.createElement("div");
+      dropdownBox.classList.add("dropdown-list");
+      dropdownBox.classList.add("collection");
+      dropdownBox.id = "collection-dropdown-list";
+      collectionList = [];
       const result = event.data.pluginMessage?.result;
       if (result.length > 0) {
         collectionList = result;
-        for (let i = 0; i < result.length; i++) {
-          const dropdownItem = document.createElement('div')
-          dropdownItem.classList.add('dropdown-item')
-          dropdownItem.innerText = `${result[i].name}`;
+        for (let item of result) {
+          const dropdownItem = document.createElement("div");
+          dropdownItem.classList.add("dropdown-item");
+          dropdownItem.innerText = `${item.name}`;
+          dropdownItem.style = "color: white;";
           dropdownItem.onclick = () => {
-            currentSelectCollection = result[i]
-            document.getElementById('collection-list').getElementsByTagName('p')[0].innerText = result[i].name;
-            const dropdown = document.getElementById('collection-dropdown-list')
-            main.removeChild(dropdown)
-            parent.postMessage({ pluginMessage: { type: 'select-collection', collectionId: result[i].id } }, '*',)
+            currentSelectCollection = item;
+            const collectionSelect = document
+              .getElementById("collection-list")
+              .getElementsByTagName("div")[0];
+            collectionSelect.innerText = item.name;
+            collectionSelect.style = "color:white;"
+            const dropdownList = document.getElementById(
+              "collection-dropdown-list"
+            );
+            const dropdown = document.getElementById("dropdown-collection");
+            if (dropdown.className.includes("up")) {
+              dropdown.className = "fa fa-angle-down";
+            } else {
+              dropdown.className = "fa fa-angle-up";
+            }
+            main.removeChild(dropdownList);
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: "select-collection",
+                  collectionId: item.id,
+                },
+              },
+              "*"
+            );
 
             isOpenDropdownCollectionList = false;
-          }
-          dropdownBox.appendChild(dropdownItem)
-
+          };
+          dropdownBox.appendChild(dropdownItem);
         }
       } else {
-        const dropdownItem = document.createElement('div')
-        dropdownItem.classList.add('dropdown-item')
+        const dropdownItem = document.createElement("div");
+        dropdownItem.classList.add("dropdown-item");
         dropdownItem.innerText = `empty`;
-        dropdownBox.appendChild(dropdownItem)
+        dropdownBox.appendChild(dropdownItem);
       }
 
-      main.appendChild(dropdownBox)
+      main.appendChild(dropdownBox);
       isOpenDropdownCollectionList = true;
     }
 
-    if (event.data.pluginMessage?.type == 'select-collection') {
+    if (event.data.pluginMessage?.type === "select-collection") {
       groupList = event.data.pluginMessage?.groupList;
     }
 
-    if (event.data.pluginMessage?.type == 'gen-data') {
-      const textarea = document.getElementById('data')
+    if (event.data.pluginMessage?.type === "gen-data") {
+      const textarea = document.getElementById("data");
       const rawData = [...event.data.pluginMessage?.variableList];
-      const formatData = []
-      const modeKey = [...currentSelectCollection.modes]
+      const formatData = [];
+      const modeKey = [...currentSelectCollection.modes];
 
       rawData.forEach((item) => {
         const map = {
           key: item.key,
-        }
+        };
 
         modeKey.forEach((key) => {
-          map[key.name] = item.modes[key.modeId]
-        })
+          map[key.name] = item.modes[key.modeId];
+        });
 
-
-        formatData.push(map)
-      })
+        formatData.push(map);
+      });
 
       textarea.value = JSON.stringify(formatData);
     }
-
-  }
+  };
 </script>
